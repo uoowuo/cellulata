@@ -1,0 +1,36 @@
+{
+  "name": "cellulata",
+  "description": "A cellular automata game",
+  "dependencies": {
+    "phaser": "^2.6.1"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.9.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.0.1",
+    "class-mixin": "^2.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat": "^2.6.0",
+    "live-server": "^1.0.0",
+    "phaser": "^2.6.1",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "scripts": {
+    "dev": "bash -c \" npm run build && live-server --port=8848 --browser=C:/Users/non/AppData/Local/Chromium/Application/chrome.exe ./dist/ & gulp watch \"",
+    "build": "gulp",
+    "clean": "rm -rf ./dist",
+    "release": "npm run build && rm -rf ../../demos/uoowuo.github.io/cellulata/* && cp -a ./dist/* ../../demos/uoowuo.github.io/cellulata/ && echo release copied"
+  },
+  "keywords": [
+    "game",
+    "cellular automata",
+    "cellular automation",
+    "simulation",
+    "life",
+    "conway"
+  ],
+  "homepage": "https://github.com/uoowuo/cellulata/",
+  "license": "GPL-3.0",
+  "version": "0.1.0"
+}
