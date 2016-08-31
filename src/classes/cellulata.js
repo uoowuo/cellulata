@@ -3,7 +3,9 @@ window.PIXI = require('phaser/build/custom/pixi');
 window.p2 = require('phaser/build/custom/p2');
 window.Phaser = require('phaser/build/custom/phaser-split');
 import World from './world';
+import Grid from './grid';
 import * as Cell from './cell';
+import Util from './util';
 
 /**
  * Represents the overall game setup.
@@ -17,18 +19,25 @@ export default class Cellulata {
      */
     constructor (scene) {
 
-        // Set properties
-
+        // Setup parameters
+        this.worldSize = 16;                 // World square side in cells
+        this.assetsCellSize = 32;            // Cell graphic square side in pixels
+        this.animationsStaggerRange = 1300;  // Maximal offset difference between idle animations in different cells
+        this.animationsFramerate = 2;        // Animations' framerate
 
         // Setup asset loader
+        const this1 = this;
         const preload = () => {
-            // this1.assets = this1.loadAssets([
-            //     './images/symbolA.png',
-            //     './images/symbolB.png',
-            //     './images/symbolC.png',
-            //     './images/symbolD.png',
-            //     './images/symbolE.png'
-            // ], 'spritesheet', 216, 144);
+            this1.assets = this1.loadAssets([
+                './images/cell-rock.png',
+                './images/cell-soil.png',
+                './images/cell-quartz.png',
+                './images/cell-water.png',
+                './images/cell-nitrogen.png',
+                './images/cell-oxygen.png',
+                './images/cell-co2.png',
+                './images/cell-algae.png'
+            ], 'spritesheet', this.assetsCellSize, this.assetsCellSize);
         };
 
         // Start the game
@@ -47,31 +56,42 @@ export default class Cellulata {
      * @param    loaderArgs  The rest of the arguments are passed on to loader function
      * @returns  {Array}     Array of asset keys for access
      */
-    // loadAssets (assetPaths, loaderFunc, ...loaderArgs) {
-    //
-    //     // Load assets with a given Phaser loader function, pushing asset keys to an array along the way, and return the array
-    //     var assetKeys = [];
-    //     for (let i = 0; i < assetPaths.length; i++) {
-    //         let assetName = assetPaths[i].split('/').slice(-1)[0].replace(/[.][\w\d_-]+$/, '');  // Take last from path and remove '.ext'
-    //         this.game.load[loaderFunc](assetName, assetPaths[i], ...loaderArgs);
-    //         assetKeys.push(assetName);
-    //     }
-    //     return assetKeys;
-    // }
+    loadAssets (assetPaths, loaderFunc, ...loaderArgs) {
+
+        // Load assets with a given Phaser loader function, pushing asset keys to an array along the way, and return the array
+        var assetKeys = [];
+        for (let i = 0; i < assetPaths.length; i++) {
+            let assetName = assetPaths[i].split('/').slice(-1)[0].replace(/[.][\w\d_-]+$/, '');  // Take last from path and remove '.ext'
+            this.game.load[loaderFunc](assetName, assetPaths[i], ...loaderArgs);
+            assetKeys.push(assetName);
+        }
+        return assetKeys;
+    }
 
     /**
      * Sets up the game world.
      */
     setupWorld () {
 
-        // Setup physics & animations
-        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        // Set Phaser options
         this.game.tweens.frameBased = true;
+        this.game.stage.disableVisibilityChange = true;
 
         // Create and populate the world
-        this.world = new World();
-        ////////////////////
-        
+        this.world = new World(this.worldSize);
+
+        // Generate content
+        const maxIndexX = this.world.width - 1;
+        const maxIndexY = this.world.height - 1;
+        this.world.grid.rectangle([0, maxIndexY - 0.8 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.CO2()));
+        this.world.grid.rectangle([0, maxIndexY - 0.7 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Oxygen()));
+        this.world.grid.rectangle([0, maxIndexY - 0.6 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Nitrogen()));
+        this.world.grid.rectangle([0, maxIndexY - 0.5 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Water()));
+        this.world.grid.rectangle([0, maxIndexY - 0.4 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Algae()));
+        this.world.grid.rectangle([0, maxIndexY - 0.3 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Soil()));
+        this.world.grid.rectangle([0, maxIndexY - 0.2 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Quartz()));
+        this.world.grid.rectangle([0, maxIndexY - 0.1 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Rock()));
+
     }
 
     /**

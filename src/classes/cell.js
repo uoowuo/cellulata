@@ -1,4 +1,3 @@
-// import mixin from 'class-mixin';  // @todo Use or remove and uninstall
 import Speed from './speed';
 import {MatterState, CellType} from './enums';
 
@@ -21,15 +20,43 @@ class Cell {
      * @param  {Speed}        speed        Speed and direction of movement
      * @param  {Number}       temperature  Temperature, integer 0..
      * @param  {Number|null}  integrity    Structural integrity, integer 0..255 or null if not applicable
+     * @param  {String}       spriteKey    Assets key for sprite access
      */
-    constructor (state = MatterState.absent, type = CellType.void, mass = 0, speed = Speed.zero, temperature = 0, integrity = 255) {
+    constructor (state = MatterState.absent, type = CellType.void, mass = 0, speed = Speed.zero, temperature = 0, integrity = 255, spriteKey = 'cell-generic') {
 
+        // Set properties
         this.state = state;
         this.type = type;
         this.mass = mass;
         this.speed = speed;
         this.temperature = temperature;
         this.integrity = integrity;
+        this.spriteKey = spriteKey;
+
+        // Enable sprite and animations
+        this.sprite = cellulata.game.add.sprite(0, 0, this.spriteKey);
+        if (this.sprite.animations.frameTotal > 1) {
+            const animationStaggerDelay = Math.floor(Math.random() * cellulata.animationsStaggerRange);
+            this.staggerTimeoutHandle = setTimeout(() => {
+                this.sprite.animations.add('idle').play(cellulata.animationsFramerate, true);
+            }, animationStaggerDelay);
+        }
+    }
+
+    /**
+     * Updates the cell's internal properties based on current world state
+     */
+    updateModel () {
+
+    }
+
+    /**
+     * Updates the cell's visual representation and position in the world
+     */
+    updateView () {
+
+        this.sprite.x = this.x * this.sprite.width;
+        this.sprite.y = this.y * this.sprite.height;
     }
 }
 
@@ -46,10 +73,11 @@ class Solid extends Cell {
      * @param  {Speed}        speed        Speed and direction of movement
      * @param  {Number}       temperature  Temperature, integer 0..
      * @param  {Number|null}  integrity    Structural integrity, integer 0..255 or null if not applicable
+     * @param  {String}       spriteKey    Assets key for sprite access
      */
-    constructor (type = CellType.rock, mass = 2, speed = Speed.zero, temperature = 0, integrity = 255) {
+    constructor (type = CellType.rock, mass = 2, speed = Speed.zero, temperature = 0, integrity = 255, spriteKey = 'cell-solid') {
 
-        super(MatterState.solid, type, mass, speed, temperature, integrity);
+        super(MatterState.solid, type, mass, speed, temperature, integrity, spriteKey);
     }
 }
 
@@ -63,12 +91,13 @@ class Liquid extends Cell {
      *
      * @param  {CellType}  type         Cell type
      * @param  {Number}    mass         Mass, integer
-     * @param  {Speed}   speed        Speed and direction of movement
-     * @param  {Number}  temperature  Temperature, integer 0..
+     * @param  {Speed}     speed        Speed and direction of movement
+     * @param  {Number}    temperature  Temperature, integer 0..
+     * @param  {String}    spriteKey    Assets key for sprite access
      */
-    constructor (type = CellType.water, mass = 1, speed = Speed.zero, temperature = 0) {
+    constructor (type = CellType.water, mass = 1, speed = Speed.zero, temperature = 0, spriteKey = 'cell-liquid') {
 
-        super(MatterState.liquid, type, mass, speed, temperature, null);
+        super(MatterState.liquid, type, mass, speed, temperature, null, spriteKey);
     }
 }
 
@@ -82,12 +111,13 @@ class Gas extends Cell {
      *
      * @param  {CellType}  type         Cell type
      * @param  {Number}    mass         Mass, integer
-     * @param  {Speed}   speed        Speed and direction of movement
-     * @param  {Number}  temperature  Temperature, integer 0..
+     * @param  {Speed}     speed        Speed and direction of movement
+     * @param  {Number}    temperature  Temperature, integer 0..
+     * @param  {String}    spriteKey    Assets key for sprite access
      */
-    constructor (type = CellType.nitrogen, mass = 0, speed = Speed.zero, temperature = 0) {
+    constructor (type = CellType.nitrogen, mass = 0, speed = Speed.zero, temperature = 0, spriteKey = 'cell-gas') {
 
-        super(MatterState.gas, type, mass, speed, temperature, null);
+        super(MatterState.gas, type, mass, speed, temperature, null, spriteKey);
     }
 }
 
@@ -99,15 +129,16 @@ class Life extends Solid {
     /**
      * Creates a new living cell.
      *
-     * @param  {CellType}  type         Cell type
-     * @param  {Number}    mass         Mass, integer
+     * @param  {CellType}     type         Cell type
+     * @param  {Number}       mass         Mass, integer
      * @param  {Speed}        speed        Speed and direction of movement
      * @param  {Number}       temperature  Temperature, integer 0..
      * @param  {Number|null}  integrity    Structural integrity, integer 0..255 or null if not applicable
+     * @param  {String}       spriteKey    Assets key for sprite access
      */
-    constructor (type = CellType.algae, mass = 1, speed = Speed.zero, temperature = 0, integrity = 255) {
+    constructor (type = CellType.algae, mass = 1, speed = Speed.zero, temperature = 0, integrity = 255, spriteKey = 'cell-life') {
 
-        super(type, mass, speed, temperature, integrity);
+        super(type, mass, speed, temperature, integrity, spriteKey);
     }
 }
 
@@ -129,7 +160,7 @@ export class Rock extends Solid {
      */
     constructor (speed = Speed.zero, temperature = 0, integrity = 255) {
 
-        super(CellType.rock, 2, speed, temperature, integrity);
+        super(CellType.rock, 2, speed, temperature, integrity, 'cell-rock');
     }
 }
 
@@ -147,7 +178,7 @@ export class Soil extends Solid {
      */
     constructor (speed = Speed.zero, temperature = 0, integrity = 255) {
 
-        super(CellType.soil, 2, speed, temperature, integrity);
+        super(CellType.soil, 2, speed, temperature, integrity, 'cell-soil');
     }
 }
 
@@ -165,7 +196,7 @@ export class Quartz extends Solid {
      */
     constructor (speed = Speed.zero, temperature = 0, integrity = 255) {
 
-        super(CellType.quartz, 2, speed, temperature, integrity);
+        super(CellType.quartz, 2, speed, temperature, integrity, 'cell-quartz');
     }
 }
 
@@ -182,7 +213,7 @@ export class Water extends Liquid {
      */
     constructor (speed = Speed.zero, temperature = 0) {
 
-        super(CellType.water, 1, speed, temperature);
+        super(CellType.water, 1, speed, temperature, 'cell-water');
     }
 }
 
@@ -199,7 +230,7 @@ export class Nitrogen extends Gas {
      */
     constructor (speed = Speed.zero, temperature = 0) {
 
-        super(CellType.nitrogen, 1, speed, temperature);
+        super(CellType.nitrogen, 1, speed, temperature, 'cell-nitrogen');
     }
 }
 
@@ -216,7 +247,7 @@ export class Oxygen extends Gas {
      */
     constructor (speed = Speed.zero, temperature = 0) {
 
-        super(CellType.oxygen, 1, speed, temperature);
+        super(CellType.oxygen, 1, speed, temperature, 'cell-oxygen');
     }
 }
 
@@ -233,7 +264,7 @@ export class CO2 extends Gas {
      */
     constructor (speed = Speed.zero, temperature = 0) {
 
-        super(CellType.co2, 1, speed, temperature);
+        super(CellType.co2, 1, speed, temperature, 'cell-co2');
     }
 }
 
@@ -250,7 +281,7 @@ export class Algae extends Life {
      * @param  {Number|null}  integrity    Structural integrity, integer 0..255 or null if not applicable
      */
     constructor (speed = Speed.zero, temperature = 0, integrity = 255) {
-        
-        super(CellType.algae, 1, speed, temperature, integrity);
+
+        super(CellType.algae, 1, speed, temperature, integrity, 'cell-algae');
     }
 }

@@ -54,6 +54,10 @@ export default class Grid {
      */
     rectangle (start, end, func) {
 
+        // Control input
+        start = [Math.floor(start[0]), Math.floor(start[1])];
+        end = [Math.floor(end[0]), Math.floor(end[1])];
+
         // Determine the lowest and highest pairs of coordinates
         const lowCoords = [Math.min(start[0], end[0]), Math.min(start[1], end[1])];
         const highCoords = [Math.max(start[0], end[0]), Math.max(start[1], end[1])];
@@ -71,19 +75,30 @@ export default class Grid {
     }
 
     /**
-     * Produces a function that fills the grid address at x, y with a copy of the given cell.
-     * @todo Make it static, overcome possible compiler error with _this caching the wrong this
+     * Produces a function that fills the grid address at x, y using given cell constructor function.
      *
-     * @param    {Cell}   cell   Cell object to fill the rectangle with
-     * @returns  {Function}      Function that puts a copy of the cell at given grid address
+     * @param    {Function}  cellConstructor  Cell object constructor to fill the address with
+     * @returns  {Function}                   Function that puts a copy of the cell at given grid address
      */
-    static fill (cell) {
+    static fill (cellConstructor) {
 
-        // Creates a copy of the cell at given grid address
+        // Creates a new cell at given grid address
         return (grid, x, y) => {
-            const templatePrototype = Object.getPrototypeOf(cell);
-            grid[x][y] = Object.create(templatePrototype);
-            Object.assign(grid[x][y], cell);
+
+            // Destroy existing cell, if any
+            if (typeof grid[x][y] !== 'undefined') {
+                clearTimeout(grid[x][y].staggerTimeoutHandle);
+                grid[x][y].sprite.destroy(true);
+                delete grid[x][y];
+            }
+
+            // Construct the cell
+            grid[x][y] = cellConstructor();
+
+            // Update position
+            grid[x][y].x = x;
+            grid[x][y].y = y;
+            grid[x][y].updateView();
         };
 
     }
