@@ -5,7 +5,7 @@ window.Phaser = require('phaser/build/custom/phaser-split');
 import World from './world';
 import Grid from './grid';
 import * as Cell from './cell';
-import Util from './util';
+import Shaders from './shaders';
 
 /**
  * Represents the overall game setup.
@@ -26,8 +26,11 @@ export default class Cellulata {
         this.animationsFramerate = 2;        // Animations' framerate
 
         // Setup asset loader
+        // @todo Atlas
         const this1 = this;
         const preload = () => {
+
+            // Cell tiles
             this1.assets = this1.loadAssets([
                 './images/cell-rock.png',
                 './images/cell-soil.png',
@@ -38,6 +41,10 @@ export default class Cellulata {
                 './images/cell-co2.png',
                 './images/cell-algae.png'
             ], 'spritesheet', this.assetsCellSize, this.assetsCellSize);
+
+            // Background
+            this.game.load.spritesheet('background', './images/background.jpg');
+            this.assets.push('background');
         };
 
         // Start the game
@@ -77,10 +84,19 @@ export default class Cellulata {
         this.game.tweens.frameBased = true;
         this.game.stage.disableVisibilityChange = true;
 
+        // Setup filters
+        this.uniforms = [];
+        this.filters = {};
+        // this.filters.whiteBorder = new Phaser.Filter(this.game, this.uniforms, Shaders.whiteBorder);
+
         // Create and populate the world
         this.world = new World(this.worldSize);
 
-        // Generate content
+        // Set background
+        this.background = this.game.add.sprite(0, 0, 'background');
+        // this.background.filters = [ this.filters.whiteBorder ];
+
+        // Generate cells grid
         const maxIndexX = this.world.width - 1;
         const maxIndexY = this.world.height - 1;
         this.world.grid.rectangle([0, maxIndexY - 0.8 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.CO2()));
@@ -99,6 +115,10 @@ export default class Cellulata {
      */
     mainLoop () {
 
+
+        for (let filter in this.filters) {
+            this.filters[filter].update();
+        }
         // Wrap reel symbols
         // this.reels.forEach((reel) => {
         //     reel.symbols.forEach((symbol) => {

@@ -2,5 +2,6 @@
 archive
 node_modules
 dist
-*.log*
+*.log
+*.blend1
 tmp

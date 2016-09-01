@@ -34,6 +34,7 @@ class Cell {
         this.spriteKey = spriteKey;
 
         // Enable sprite and animations
+        // @todo there is a bug whereby first animation frame overlaps the neighbouring tile by 1 pixel on the left
         this.sprite = cellulata.game.add.sprite(0, 0, this.spriteKey);
         if (this.sprite.animations.frameTotal > 1) {
             const animationStaggerDelay = Math.floor(Math.random() * cellulata.animationsStaggerRange);

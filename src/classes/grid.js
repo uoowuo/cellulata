@@ -82,7 +82,7 @@ export default class Grid {
      */
     static fill (cellConstructor) {
 
-        // Creates a new cell at given grid address
+        /** Creates a new cell at given grid address */
         return (grid, x, y) => {
 
             // Destroy existing cell, if any
