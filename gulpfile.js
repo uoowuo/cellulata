@@ -11,8 +11,8 @@ gulp.task('default', ['js', 'static'], function() {});
 // Recompile files as they change
 gulp.task('watch', function() {
 
-    gulp.watch(['./src/**/*.js'], ['js']);
-    gulp.watch(['./src/index.html', './src/styles/**/*.*', './src/images/**/*.*'], ['static']);
+    gulp.watch(['./src/**/*.js'], { interval: 500 }, ['js']);
+    gulp.watch(['./src/index.html', './src/styles/**/*.*', './src/images/**/*.*'], { interval: 500 }, ['static']);
 });
 
 // Compile JS

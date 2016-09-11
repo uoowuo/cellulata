@@ -8,6 +8,8 @@ import {MatterState, CellType} from './enums';
 
 /**
  * Represents a single generic simulation cell.
+ * @todo a bug in Phaser perhaps causes every first cell in an animation to stretch 1 pixel left and overlap its neighbour
+ * @todo the bug disappears if a filter is applied to the cell
  */
 class Cell {
 
@@ -33,9 +35,17 @@ class Cell {
         this.integrity = integrity;
         this.spriteKey = spriteKey;
 
-        // Enable sprite and animations
-        // @todo there is a bug whereby first animation frame overlaps the neighbouring tile by 1 pixel on the left
+        // Add sprite, enable input
         this.sprite = cellulata.game.add.sprite(0, 0, this.spriteKey);
+        this.sprite.smoothed = false;
+        this.sprite.filters = this.sprite.filters || [];
+        this.sprite.filters = this.sprite.filters.concat(cellulata.filters.transparentBorder);
+        this.sprite.inputEnabled = true;
+        this.sprite.events.onInputOver.add(this.handleHover, this);
+        this.sprite.events.onInputOut.add(this.handleHover.bind(this, false), this);
+        
+        // Enable idle animation
+        // @todo there is a bug whereby first animation frame overlaps the neighbouring tile by 1 pixel on the left
         if (this.sprite.animations.frameTotal > 1) {
             const animationStaggerDelay = Math.floor(Math.random() * cellulata.animationsStaggerRange);
             this.staggerTimeoutHandle = setTimeout(() => {
@@ -58,6 +68,27 @@ class Cell {
 
         this.sprite.x = this.x * this.sprite.width;
         this.sprite.y = this.y * this.sprite.height;
+    }
+
+    /**
+     * Handles onhover functionality
+     * 
+     * @param  {Boolean}  enable  Whether to enable functionality (or disable) 
+     */
+    handleHover (enable = true) {
+        
+        // On hover, highlight the cell. Array.push breaks PIXI for some reason
+        if (enable) {
+            this.sprite.filters = this.sprite.filters || [];
+            this.sprite.filters = this.sprite.filters.concat(cellulata.filters.transparentBorder);
+
+        // On hover out, remove cell highlight
+        } else {
+            this.sprite.filters.splice(this.sprite.filters.indexOf(cellulata.filters.transparentBorder), 1);
+            if (this.sprite.filters.length === 0) {
+                this.sprite.filters = undefined;
+            }
+        }
     }
 }
 

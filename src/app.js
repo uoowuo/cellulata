@@ -1,5 +1,5 @@
 /**
- * Cellulata, v0.3.0
+ * Cellulata, v0.3.1
  *
  * Description: A cellular automata game.
  */

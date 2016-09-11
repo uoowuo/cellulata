@@ -72,6 +72,7 @@ export default class Cellulata {
             this.game.load[loaderFunc](assetName, assetPaths[i], ...loaderArgs);
             assetKeys.push(assetName);
         }
+        
         return assetKeys;
     }
 
@@ -85,16 +86,21 @@ export default class Cellulata {
         this.game.stage.disableVisibilityChange = true;
 
         // Setup filters
-        this.uniforms = [];
+        // this.uniforms = {
+        //     assetsCellWidth: this.assetsCellSize,
+        //     assetsCellHeight: this.assetsCellSize
+        // };
         this.filters = {};
-        // this.filters.whiteBorder = new Phaser.Filter(this.game, this.uniforms, Shaders.whiteBorder);
+        this.filters.highlight = new Phaser.Filter(this.game, this.uniforms, Shaders.highlight);
+        this.filters.transparentBorder = new Phaser.Filter(this.game, this.uniforms, Shaders.transparentBorder);
+        this.filters.transparentBorder.setResolution(this.assetsCellSize, this.assetsCellSize);
 
         // Create and populate the world
         this.world = new World(this.worldSize);
 
         // Set background
         this.background = this.game.add.sprite(0, 0, 'background');
-        // this.background.filters = [ this.filters.whiteBorder ];
+        this.background.smoothed = false;
 
         // Generate cells grid
         const maxIndexX = this.world.width - 1;
@@ -107,7 +113,6 @@ export default class Cellulata {
         this.world.grid.rectangle([0, maxIndexY - 0.3 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Soil()));
         this.world.grid.rectangle([0, maxIndexY - 0.2 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Quartz()));
         this.world.grid.rectangle([0, maxIndexY - 0.1 * maxIndexY], [maxIndexX, maxIndexY], Grid.fill(() => new Cell.Rock()));
-
     }
 
     /**
@@ -115,15 +120,9 @@ export default class Cellulata {
      */
     mainLoop () {
 
-
+        // Update filters
         for (let filter in this.filters) {
-            this.filters[filter].update();
+            this.filters[filter].update(this.game.input.activePointer);
         }
-        // Wrap reel symbols
-        // this.reels.forEach((reel) => {
-        //     reel.symbols.forEach((symbol) => {
-        //         this.game.world.wrap(symbol.gameObject);
-        //     });
-        // });
     }
 }
