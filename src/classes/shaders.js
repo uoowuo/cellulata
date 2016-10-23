@@ -70,28 +70,28 @@ Shaders.transparentBorder = `
         }
     }
 `;
-//
-// /**
-//  * White-tinted transparent border
-//  */
-// Shaders.transparentBorder = `
-//     precision mediump float;
-//
-//     uniform vec2 resolution;
-//     uniform sampler2D uSampler;
-//     varying vec2 vTextureCoord;
-//
-//     void main() {
-//
-//         const float borderWidth = 1.0;
-//         const vec4 borderColor = vec4(1.0, 1.0, 1.0, 1.0);
-//
-//         // If within border, mix with preset color
-//         vec4 texture = texture2D(uSampler, vTextureCoord);
-//         if (gl_FragCoord.x >= 1.0) {
-//             gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-//         } else {
-//             gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
-//         }
-//     }
-// `;
+
+/**
+ * White-tinted transparent border
+ */
+Shaders.transparentBorder = `
+    precision mediump float;
+
+    uniform vec2 resolution;
+    uniform sampler2D uSampler;
+    varying vec2 vTextureCoord;
+
+    void main() {
+
+        const float borderWidth = 1.0;
+        const vec4 borderColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+        // If within border, mix with preset color
+        vec4 texture = texture2D(uSampler, vTextureCoord);
+        if (gl_FragCoord.x >= 320.0) {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        } else {
+            gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+        }
+    }
+`;
